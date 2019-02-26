@@ -165,4 +165,46 @@ namespace helloworld
             return Result.Succeeded;
         }
     }
+    
+    
+    [Transaction(TransactionMode.Automatic)]
+    [Regeneration(RegenerationOption.Manual)]
+    public class ArgumentUsage :IExternalCommand
+    {
+        public Result Execute(ExternalCommandData commandData,ref string message, ElementSet elements)
+        {
+            ElementSet selections = new ElementSet();
+            ArrayList m_walls = new ArrayList();
+            foreach(ElementId elementId in commandData.Application.ActiveUIDocument.Selection.GetElementIds())
+            {
+                selections.Insert(commandData.Application.ActiveUIDocument.Document.GetElement(elementId));
+            }
+            foreach (Element element in selections)
+            {
+                Wall wall = element as Wall;
+                if (null != wall)
+
+                {
+                    if ("Basic" != wall.WallType.Kind.ToString())
+                    {
+                        continue;
+                    }
+                    m_walls.Add(wall);
+                }
+            }
+
+
+
+            if (0 == m_walls.Count)
+            {
+                message += "please select basic walls";
+            }
+            else
+            {
+                string mes = string.Format("有{0}个墙被选择了",m_walls.Count);
+                message += mes;
+            }
+            return Result.Failed;
+        }
+    }
 }
